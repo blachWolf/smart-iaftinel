@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smart~Ieftinel</title>
+<meta name="theme-color" content="#0f6b5c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Smart~Ieftinel">
+
+<style>
+:root{--bg:#eef2f4;--surface:#fff;--ink:#16232b;--muted:#5d6f78;--line:#d5dee2;--accent:#0f6b5c;--accent-ink:#fff;--bad:#b3411a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f171c;--surface:#18232a;--ink:#e6eef1;--muted:#93a6af;--line:#2b3a42;--accent:#3fbf9f;--accent-ink:#0b1f1a;--bad:#ff8a5c}}
+:root[data-theme="dark"]{--bg:#0f171c;--surface:#18232a;--ink:#e6eef1;--muted:#93a6af;--line:#2b3a42;--accent:#3fbf9f;--accent-ink:#0b1f1a;--bad:#ff8a5c}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Avenir Next","Segoe UI",Roboto,"Helvetica Neue",sans-serif}
+main{max-width:34rem;margin:0 auto;padding:1rem 1rem 3rem}
+h1{font-size:1.25rem;margin:.5rem 0 1rem}
+.tabs{display:flex;gap:.25rem;background:var(--line);padding:.2rem;border-radius:.7rem;margin-bottom:1rem}
+.tabs button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;padding:.6rem;border-radius:.55rem;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink)}
+.total{background:var(--accent);color:var(--accent-ink);border-radius:.9rem;padding:1rem 1.1rem;margin-bottom:1rem}
+.total small{display:block;opacity:.85}
+.total strong{font-size:2.1rem;line-height:1.15;letter-spacing:-.02em}
+.total .sub{margin-top:.35rem;font-size:.95rem}
+form{display:grid;grid-template-columns:1fr 5.5rem;gap:.5rem;margin-bottom:1rem}
+form .full{grid-column:1/-1}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:.6rem;padding:.65rem .75rem;min-width:0}
+input:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.add{grid-column:1/-1;border:0;background:var(--ink);color:var(--bg);font:inherit;font-weight:700;padding:.7rem;border-radius:.6rem;cursor:pointer}
+ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:.8rem}
+li{display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;border-bottom:1px solid var(--line)}
+li:last-child{border-bottom:0}
+li input[type=checkbox]{width:1.4rem;height:1.4rem;accent-color:var(--accent);flex:none;padding:0}
+li .name{flex:1;min-width:0;overflow-wrap:anywhere}
+li.done .name{text-decoration:line-through;color:var(--muted)}
+li .amt{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
+li .del{border:0;background:transparent;color:var(--muted);font-size:1.3rem;line-height:1;cursor:pointer;padding:.3rem .5rem;border-radius:.4rem}
+.empty{padding:1.1rem;color:var(--muted);text-align:center}
+.row{display:flex;gap:.5rem;justify-content:space-between;margin:.9rem 0 .4rem;align-items:center}
+.link{border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;cursor:pointer;padding:.3rem 0}
+.sum{display:grid;grid-template-columns:1fr auto;gap:.3rem .8rem;background:var(--surface);border:1px solid var(--line);border-radius:.8rem;padding:.9rem 1rem;margin-bottom:1rem}
+.sum b{font-variant-numeric:tabular-nums;text-align:right}
+.neg{color:var(--bad)}
+.note{color:var(--muted);font-size:.85rem;margin-top:1.2rem}
+.bar{height:.5rem;border-radius:1rem;background:rgba(127,127,127,.35);margin-top:.7rem;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:currentColor;border-radius:1rem}
+.total.over{background:var(--bad);color:var(--bg)}
+label.cap{display:block;font-size:.9rem;color:var(--muted);margin-bottom:1rem}
+label.cap input{margin-top:.3rem}
+.hint{margin:0;font-size:.85rem;color:var(--muted);min-height:1.2em}
+h2{font-size:1rem;margin:1.5rem 0 .5rem}
+label.chk{display:flex;align-items:center;gap:.5rem;font-size:.95rem}
+label.chk input{width:1.2rem;height:1.2rem;accent-color:var(--accent);padding:0}
+textarea{width:100%;font:.8rem/1.35 ui-monospace,Menlo,Consolas,monospace;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:.6rem;padding:.65rem .75rem;margin:.7rem 0}
+textarea:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.hrow{margin-bottom:.8rem}
+.hh{display:flex;justify-content:space-between;gap:.6rem;font-size:.9rem}
+.hbar{height:.6rem;background:var(--line);border-radius:1rem;overflow:hidden;margin-top:.25rem}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:1rem}
+a.ext{display:block;text-align:center;text-decoration:none;color:var(--accent);font-weight:700;border:2px solid var(--accent);border-radius:.6rem;padding:.65rem;margin-bottom:.3rem}
+a.ext:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lnks{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.lnks a.ext{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chips:empty{display:none}
+.chips button{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem;padding:.35rem .65rem;border-radius:2rem;cursor:pointer}
+.ban{display:flex;flex-wrap:wrap;gap:.2rem .9rem;align-items:center;background:var(--surface);border:1px solid var(--bad);border-radius:.7rem;padding:.6rem .8rem;margin-bottom:1rem;font-size:.9rem}
+.ban span{flex:1 1 100%}
+details.sec>summary{cursor:pointer;font-weight:700;font-size:1rem;margin:1.2rem 0 .5rem}
+.gen{margin:.1rem 0 .4rem}
+.gen li{flex-wrap:wrap}
+.badge{display:inline-block;font-size:.72rem;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:2rem;padding:0 .4rem;margin-left:.3rem;white-space:nowrap}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Smart~Ieftinel</h1>
+<div class="tabs" role="tablist">
+<button role="tab" id="t-cos" aria-selected="true">Cumpărături</button>
+<button role="tab" id="t-bug" aria-selected="false">Buget</button>
+<button role="tab" id="t-cat" aria-selected="false">Cataloage</button>
+<button role="tab" id="t-bak" aria-selected="false">Copie</button>
+</div>
+
+<div id="bkban" class="ban" hidden><span id="bkt"></span><button class="link" id="bkgo" type="button">Fă copia acum</button><button class="link" id="bkno" type="button">Mai târziu</button></div>
+<section id="cos">
+<label class="cap">Sunt în magazinul<select id="at" aria-label="Magazinul în care ești acum" style="margin-top:.3rem"><option value="">— nu sunt într-un magazin —</option></select></label>
+<div class="total"><small>Total estimat în listă</small><strong id="tot">0,00 lei</strong><div class="sub" id="sub"></div>
+<div class="bar" id="bar" hidden><i id="fill"></i></div><div class="sub" id="capmsg"></div></div>
+<label class="cap">Plafon pentru această cumpărătură (lei)<input id="cap" placeholder="ex: 300" inputmode="decimal"></label>
+<form id="f-cos" autocomplete="off">
+<input id="c-name" placeholder="Produs (ex: lapte)" aria-label="Produs" required>
+<datalist id="dl"></datalist>
+<input id="c-price" placeholder="Preț pe bucată" aria-label="Preț în lei pe bucată" inputmode="decimal">
+<div class="full chips" id="sug"></div>
+<div class="full gen" id="gen" hidden></div>
+<input id="c-size" placeholder="Mărime ambalaj (opțional)" aria-label="Mărime ambalaj" inputmode="decimal">
+<select id="c-unit" aria-label="Unitate"><option value="">—</option><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="l">l</option><option value="m">m</option><option value="mp">mp</option></select>
+<input id="c-qty" class="full" placeholder="Câte bucăți (implicit 1)" aria-label="Câte bucăți" inputmode="decimal">
+<select id="c-store" class="full" aria-label="Magazin"><option value="">Magazin (opțional)</option></select>
+<p class="hint full" id="hint" role="status"></p>
+<button class="add" type="submit">Adaugă în listă</button>
+</form>
+<div id="freqbox"><p class="hint" id="freqt" style="margin:.2rem 0"></p><div class="chips" id="freq"></div></div>
+<details id="basebox" style="margin:.6rem 0"><summary style="cursor:pointer;font-weight:600">Lista de bază</summary>
+<p class="hint">Lucrurile de care ai nevoie mereu. Un buton le adaugă pe toate în lista de cumpărături.</p>
+<button class="add" id="base-go" type="button" style="width:100%">Adaugă lista de bază în listă</button>
+<ul id="base-l" style="margin-top:.6rem"></ul>
+<input id="base-in" placeholder="Produs nou pentru baza (ex: pâine)" aria-label="Produs pentru lista de bază" style="margin-top:.5rem">
+<div class="row" style="justify-content:flex-start;gap:1.2rem"><button class="link" id="base-add" type="button">Adaugă în bază</button><button class="link" id="base-cur" type="button">Salvează lista curentă ca bază</button></div>
+</details>
+<div class="row"><span></span><button class="link" id="vw" type="button">Arată listele pe magazine</button></div>
+<ul id="l-cos"></ul>
+<div id="bystore" hidden></div>
+<div id="cmp"></div>
+<button class="add" id="finish" type="button" style="width:100%;margin-top:.9rem">Am terminat cumpărăturile</button>
+<div class="row" style="justify-content:flex-start;gap:1.2rem"><button class="link" id="share" type="button">Copiază lista ca text</button><button class="link" id="wa" type="button">Trimite pe WhatsApp</button></div>
+<textarea id="share-out" rows="5" aria-label="Lista ca text" hidden></textarea>
+<p class="note" id="msg" role="status"></p>
+<div class="row"><span></span><button class="link" id="clear">Șterge produsele bifate, fără buget</button></div>
+</section>
+
+<section id="bug" hidden>
+<div class="total"><small>Rămân luna aceasta</small><strong id="rest">0,00 lei</strong></div>
+<div id="due"></div>
+<form id="f-bug" autocomplete="off">
+<input id="b-inc" class="full" placeholder="Venit lunar (lei)" aria-label="Venit lunar în lei" inputmode="decimal">
+<input id="b-name" placeholder="Ce este (ex: curent)" aria-label="Denumire" required>
+<input id="b-amt" placeholder="Sumă" aria-label="Sumă în lei" inputmode="decimal" required>
+<select id="b-type" class="full" aria-label="Tip"><option value="f">Factură / cheltuială fixă</option><option value="c">Cheltuială obișnuită</option></select>
+<select id="b-cat" class="full" aria-label="Categorie"></select>
+<input id="b-day" class="full" placeholder="Scadent în ziua lunii (opțional, 1-31)" inputmode="numeric" aria-label="Ziua scadenței">
+<label class="full chk"><input type="checkbox" id="b-rec"> Se repetă în fiecare lună</label>
+<button class="add" type="submit">Adaugă</button>
+</form>
+<div class="sum">
+<span>Venit lunar</span><b id="s-inc"></b>
+<span>Venituri extra</span><b id="s-x"></b>
+<span>Venit total</span><b id="s-t"></b>
+<span>Facturi și cheltuieli fixe</span><b id="s-f"></b>
+<span>Alte cheltuieli</span><b id="s-c"></b>
+</div>
+<ul id="l-bug"></ul>
+<div class="row"><span></span><button class="link" id="new-month">Șterge cheltuielile din luna aceasta</button></div>
+<details class="sec" open><summary>Venituri extra (ciubucuri)</summary>
+<form id="f-x" autocomplete="off">
+<input id="x-name" placeholder="De unde (ex: ciubuc, lucrare extra)" aria-label="Sursa venitului extra">
+<input id="x-amt" placeholder="Sumă" inputmode="decimal" aria-label="Suma în lei" required>
+<button class="add" type="submit">Adaugă venit extra</button>
+</form>
+<ul id="l-x"></ul>
+<p class="hint">Se adună la venitul lunii și cresc „Rămân luna aceasta”. La început de lună se golesc și intră în istoric.</p>
+</details>
+<details class="sec" open><summary>Pe categorii (luna aceasta)</summary>
+<div id="cats"></div>
+</details>
+<details class="sec"><summary>Se repetă lunar</summary>
+<ul id="l-rec"></ul>
+<p class="hint">Ștergerea de aici oprește repetarea din lunile următoare. Luna aceasta rămâne neschimbată.</p>
+</details>
+<details class="sec"><summary>Istoric pe luni</summary>
+<div id="hist"></div>
+</details>
+<details class="sec"><summary>Obiectiv de economisire</summary>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.7rem">
+<input id="g-name" placeholder="Ce economisești (ex: vacanță)" aria-label="Numele obiectivului">
+<input id="g-target" placeholder="Sumă țintă (lei)" inputmode="decimal" aria-label="Suma țintă">
+</div>
+<div id="g-bar"></div>
+<div style="display:grid;grid-template-columns:1fr auto;gap:.5rem">
+<input id="g-add" placeholder="Sumă pusă deoparte (negativă pentru a scădea)" inputmode="decimal" aria-label="Sumă de adăugat la economii">
+<button class="add" id="g-btn" type="button" style="grid-column:auto;padding:.65rem .9rem">Adaugă</button>
+</div>
+<p class="hint">Economiile sunt urmărite separat, nu se scad din „Rămân luna aceasta”.</p>
+</details>
+</section>
+
+<section id="cat" hidden>
+<p class="hint" style="margin-top:0">Deschide catalogul magazinului, fă capturi la paginile cu produsele tale, apoi importă prețurile.</p>
+<div class="lnks" id="links"></div>
+<h2>Prețuri din catalog</h2>
+<select id="i-store" aria-label="Magazin"></select>
+<p id="imp-off" class="hint">Se verifică dacă citirea din capturi e disponibilă…</p>
+<div id="imp" hidden>
+<input id="i-files" type="file" accept="image/*" multiple aria-label="Capturi din catalog" style="margin-top:.5rem">
+<button class="add" id="i-go" type="button" style="width:100%;margin-top:.5rem">Citește prețurile din capturi</button>
+</div>
+<details style="margin-top:.9rem"><summary style="cursor:pointer;font-weight:600">Sau lipește o listă de prețuri (text)</summary>
+<textarea id="i-txt" rows="6" aria-label="Listă de prețuri" placeholder="lapte zuzu 1,5% | 6,49 | 1 l | 05.10"></textarea>
+<p class="hint">Un produs pe rând: nume | preț | mărime (opțional) | valabil până la (opțional, ZZ.LL).</p>
+<button class="add" id="i-parse" type="button" style="width:100%;margin-top:.4rem">Verifică lista</button>
+</details>
+<details id="rawbox" style="margin-top:.6rem" hidden><summary style="cursor:pointer;font-weight:600">Sau lipește textul copiat de pe site-ul magazinului</summary>
+<textarea id="r-txt" rows="6" aria-label="Text copiat de pe site" placeholder="Deschide pagina de oferte de pe site-ul magazinului, selectează și copiază textul, apoi lipește-l aici"></textarea>
+<button class="add" id="r-go" type="button" style="width:100%;margin-top:.4rem">Extrage produsele din text</button>
+</details>
+<p class="note" id="i-msg" role="status"></p>
+<div id="i-tools" hidden style="display:grid;grid-template-columns:1fr 1fr;gap:.2rem .5rem;margin:.6rem 0 .4rem">
+<input id="i-q" placeholder="Filtrează lista (ex: lapte)" aria-label="Filtrează produsele din listă" style="grid-column:1/-1">
+<button class="link" id="i-all" type="button" style="text-align:left">Bifează tot ce se vede</button>
+<button class="link" id="i-none" type="button" style="text-align:right">Debifează tot ce se vede</button>
+<p class="hint" id="i-cnt" style="grid-column:1/-1"></p>
+</div>
+<ul id="i-list"></ul>
+<button class="add" id="i-save" type="button" style="width:100%;margin-top:.7rem" hidden>Salvează prețurile bifate</button>
+<p class="note" id="i-stat"></p>
+<p class="note" id="i-stale" style="margin-top:.3rem"></p>
+<div id="drops" hidden><h2>Prețuri scăzute recent</h2><ul id="i-drops"></ul></div>
+<h2>Cataloagele salvate</h2>
+<select id="v-store" aria-label="Magazin"></select>
+<input id="v-q" placeholder="Caută în catalogul magazinului" aria-label="Caută în catalogul salvat" style="margin-top:.5rem">
+<p class="hint" id="v-count"></p>
+<ul id="v-list"></ul>
+<div class="row"><span></span><button class="link" id="v-clear" type="button">Șterge tot catalogul acestui magazin</button></div>
+<a class="ext" style="margin-top:1rem;border-width:1px;font-weight:600" href="https://monitorulpreturilor.info" target="_blank" rel="noopener noreferrer">Monitorul Prețurilor (opțional)</a>
+</section>
+
+<section id="bak" hidden>
+<p>Datele se salvează pe acest dispozitiv și, când aplicația e deschisă din Claude, și în contul tău. Copia de rezervă e un text pe care îl salvezi tu, de exemplu într-o notiță sau într-un mesaj către tine.</p>
+<button class="add" id="mk" type="button" style="width:100%">Creează copia de rezervă</button>
+<textarea id="bk" rows="6" aria-label="Text copie de rezervă" placeholder="Aici apare copia. Pentru restaurare, lipește aici textul salvat."></textarea>
+<button class="add" id="rs" type="button" style="width:100%">Restaurează din text</button>
+<p class="note" id="bkmsg" role="status"></p>
+</section>
+
+<p class="note">Datele se salvează pe acest dispozitiv și, când deschizi aplicația din Claude, și în contul tău, deci le ai la fel pe telefon și pe calculator. Fă totuși din când în când o copie în fila Copie.</p>
+<p class="note" id="sync" role="status"></p>
+</main>
+<script>
+(function(){
+var KEY="casa-mea-v1";
+var S={items:[],ent:[],income:0,prices:{},sp:{},freq:{},extra:[],at:"",atDay:"",base:[],goal:{name:"",target:0,saved:0},cap:0,rec:[],hist:[],month:"",lastBackup:"",ts:0};
+var CATS=["Mâncare","Casă","Mașină","Facturi","Sănătate","Altele"];
+function dyOf(v){v=Math.round(Number(v));return v>=1&&v<=31?v:0;}
+function apply(p){
+if(!p||typeof p!=="object")return false;
+var n=function(v){v=Number(v);return isFinite(v)?v:0;};
+var str=function(v){return typeof v==="string"?v.slice(0,120):"";};
+var arr=function(v){return(Array.isArray(v)?v:[]).filter(function(x){return x&&typeof x==="object"&&str(x.name);});};
+var UN=["g","kg","ml","l","m","mp"];
+S.items=arr(p.items).map(function(x){return{id:str(x.id)||uid(),name:str(x.name),price:Math.max(0,n(x.price)),size:Math.max(0,n(x.size)),unit:UN.indexOf(x.unit)>=0?x.unit:"",qty:n(x.qty)>0?n(x.qty):1,done:!!x.done};});
+S.ent=arr(p.ent).map(function(x){return{id:str(x.id)||uid(),name:str(x.name),amt:Math.max(0,n(x.amt)),type:x.type==="f"?"f":"c",rec:!!x.rec,cat:CATS.indexOf(x.cat)>=0?x.cat:(x.type==="f"?"Facturi":"Altele"),day:dyOf(x.day),paid:!!x.paid};});
+S.rec=arr(p.rec).map(function(x){return{id:str(x.id)||uid(),name:str(x.name),amt:Math.max(0,n(x.amt)),cat:CATS.indexOf(x.cat)>=0?x.cat:"Facturi",day:dyOf(x.day)};});
+S.hist=(Array.isArray(p.hist)?p.hist:[]).filter(function(x){return x&&typeof x.m==="string"&&/^\d{4}-\d{2}$/.test(x.m);}).map(function(x){return{m:x.m,income:Math.max(0,n(x.income)),spent:Math.max(0,n(x.spent))};}).slice(-36);
+S.income=Math.max(0,n(p.income));S.cap=Math.max(0,n(p.cap));
+S.month=(typeof p.month==="string"&&/^\d{4}-\d{2}$/.test(p.month))?p.month:"";
+S.prices={};
+if(p.prices&&typeof p.prices==="object"&&!Array.isArray(p.prices)){Object.keys(p.prices).slice(0,1000).forEach(function(k){var v=p.prices[k];if(v&&typeof v==="object"&&n(v.price)>0)S.prices[k.slice(0,120)]={name:str(v.name)||k,price:n(v.price),size:Math.max(0,n(v.size)),unit:UN.indexOf(v.unit)>=0?v.unit:""};});}
+S.sp={};
+var DRE=/^\d{4}-\d{2}-\d{2}$/;
+if(p.sp&&typeof p.sp==="object"&&!Array.isArray(p.sp)){Object.keys(p.sp).slice(0,6000).forEach(function(k){var e=p.sp[k];if(!e||typeof e!=="object"||!e.st||typeof e.st!=="object")return;var o={name:str(e.name)||k,st:{}};Object.keys(e.st).slice(0,10).forEach(function(t){var v=e.st[t];if(v&&typeof v==="object"&&n(v.p)>0){o.st[t.slice(0,30)]={p:n(v.p),size:Math.max(0,n(v.size)),unit:UN.indexOf(v.unit)>=0?v.unit:"",d:DRE.test(v.d)?v.d:today(),u:DRE.test(v.u)?v.u:""};var hh=(Array.isArray(v.h)?v.h:[]).filter(function(x){return Array.isArray(x)&&n(x[0])>0;}).slice(0,5).map(function(x){return[n(x[0]),DRE.test(x[1])?x[1]:""];});if(hh.length)o.st[t.slice(0,30)].h=hh;}});if(Object.keys(o.st).length)S.sp[k.slice(0,120)]=o;});}
+S.base=(Array.isArray(p.base)?p.base:[]).filter(function(x){return typeof x==="string"&&x.trim();}).map(function(x){return x.slice(0,80);}).slice(0,200);
+var gl=(p.goal&&typeof p.goal==="object")?p.goal:{};
+S.goal={name:str(gl.name).slice(0,60),target:Math.max(0,n(gl.target)),saved:Math.max(0,n(gl.saved))};
+S.freq={};
+if(p.freq&&typeof p.freq==="object"&&!Array.isArray(p.freq)){Object.keys(p.freq).slice(0,500).forEach(function(k){var v=p.freq[k];if(v&&typeof v==="object"&&str(v.name)&&n(v.n)>0)S.freq[k.slice(0,120)]={name:str(v.name),n:Math.min(9999,Math.floor(n(v.n)))};});}
+S.at=str(p.at);S.atDay=DRE.test(p.atDay)?p.atDay:"";
+S.extra=arr(p.extra).map(function(x){return{id:str(x.id)||uid(),name:str(x.name),amt:Math.max(0,n(x.amt)),date:DRE.test(x.date)?x.date:""};});
+S.lastBackup=str(p.lastBackup);
+return true;}
+try{var raw=localStorage.getItem(KEY);if(raw){var jp=JSON.parse(raw);apply(jp);S.ts=Number(jp.ts)||0;}}catch(e){}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+var sync={ref:null,ready:false,busy:false,again:false,timer:null,applying:false,pulling:false,last:{},lastTs:-1,nshards:0};
+function syncMsg(t){var e=document.getElementById("sync");if(e)e.textContent=t;}
+function save(q){if(!q)S.ts=Date.now();persist();queuePush();}
+function queuePush(){if(!sync.ref||!sync.ready||sync.applying)return;clearTimeout(sync.timer);sync.timer=setTimeout(push,1500);}
+function hasData(){return !!(S.items.length||S.ent.length||Object.keys(S.sp).length||S.income||S.base.length||S.rec.length);}
+function buildDocs(){
+var core={},big=[["sp",S.sp],["prices",S.prices],["freq",S.freq]],shards=[],cur={},len=0;
+Object.keys(S).forEach(function(k){if(k!=="sp"&&k!=="prices"&&k!=="freq")core[k]=S[k];});
+big.forEach(function(b){Object.keys(b[1]).forEach(function(k){var n=JSON.stringify(k).length+JSON.stringify(b[1][k]).length+2;if(len+n>100000&&len>0){shards.push(cur);cur={};len=0;}if(!cur[b[0]])cur[b[0]]={};cur[b[0]][k]=b[1][k];len+=n;});});
+if(len>0)shards.push(cur);
+return{core:JSON.stringify(core),shards:shards.map(function(x){return JSON.stringify(x);})};
+}
+async function push(){
+if(!sync.ref||!sync.ready||sync.applying)return;
+if(sync.busy){sync.again=true;return;}
+sync.busy=true;
+try{
+var ts=S.ts||0,d=buildDocs(),i;
+for(i=0;i<d.shards.length;i++){var k="s"+i;if(sync.last[k]!==d.shards[i]){await sync.ref.doc(k).set({j:d.shards[i]});sync.last[k]=d.shards[i];}}
+for(i=d.shards.length;i<sync.nshards;i++){await sync.ref.doc("s"+i).delete();delete sync.last["s"+i];}
+sync.nshards=d.shards.length;
+if(sync.last.main!==d.core||sync.lastTs!==ts){await sync.ref.doc("main").set({ts:ts,n:d.shards.length,j:d.core});sync.last.main=d.core;sync.lastTs=ts;}
+syncMsg("Sincronizat cu contul tău la "+new Date().toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"})+".");
+}catch(e){syncMsg("Nu s-a putut sincroniza ("+((e&&e.code)||"eroare")+"). Datele rămân salvate pe acest dispozitiv.");}
+finally{sync.busy=false;if(sync.again){sync.again=false;queuePush();}}
+}
+function rerender(){
+$("cap").value=S.cap?String(S.cap):"";$("b-inc").value=S.income?String(S.income):"";$("g-name").value=S.goal.name;$("g-target").value=S.goal.target?String(S.goal.target):"";
+if(S.atDay!==today())S.at="";$("at").value=S.at;applyAt();
+renderCos();renderBug();renderNames();renderStat();renderBan();renderBase();renderGoal();
+}
+async function pullAll(m){
+var parts={sp:{},prices:{},freq:{}},i,shs=[];
+for(i=0;i<(Number(m.n)||0);i++){var sd=await sync.ref.doc("s"+i).get();if(!sd.exists)throw{code:"incomplet"};shs.push(sd.data().j);}
+var core=JSON.parse(m.j);
+shs.forEach(function(j){var o=JSON.parse(j);["sp","prices","freq"].forEach(function(sec){if(o[sec])Object.keys(o[sec]).forEach(function(k){parts[sec][k]=o[sec][k];});});});
+if(hasData()){try{localStorage.setItem(KEY+"-prev",JSON.stringify(S));}catch(e){}}
+sync.applying=true;
+try{core.sp=parts.sp;core.prices=parts.prices;core.freq=parts.freq;apply(core);S.ts=Number(m.ts)||0;persist();
+shs.forEach(function(j,k){sync.last["s"+k]=j;});sync.nshards=shs.length;sync.last.main=m.j;sync.lastTs=S.ts;
+rerender();}
+finally{sync.applying=false;}
+syncMsg("Datele din contul tău au fost încărcate la "+new Date().toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"})+".");
+}
+async function handleRemote(snap){
+if(sync.pulling||sync.busy)return false;
+sync.pulling=true;
+try{
+if(!snap.exists){if(hasData()){if(!S.ts){S.ts=Date.now();persist();}return true;}syncMsg("Contul tău nu are încă date salvate.");return false;}
+var m=snap.data(),rts=Number(m.ts)||0;
+if(rts>(S.ts||0)){await pullAll(m);return false;}
+if(rts<(S.ts||0))return true;
+syncMsg("Sincronizat cu contul tău.");return false;
+}catch(e){syncMsg("Nu s-a putut citi din cont ("+((e&&e.code)||"eroare")+"). Datele de pe acest dispozitiv nu au fost schimbate.");return false;}
+finally{sync.pulling=false;}
+}
+async function initSync(){
+try{
+if(!window.claude||!window.claude.use){syncMsg("Datele sunt salvate doar pe acest dispozitiv (sincronizarea merge doar când aplicația e deschisă din Claude).");return;}
+var db=await window.claude.use("db"),us=await window.claude.use("user");
+if(!db||!us){syncMsg("Sincronizarea cu contul nu e disponibilă aici. Datele sunt salvate doar pe acest dispozitiv.");return;}
+var id=await us.id();
+if(!id){syncMsg("Sincronizarea cere să fii conectat în Claude. Datele sunt salvate doar pe acest dispozitiv.");return;}
+sync.ref=db.collection("data/users/"+id);
+var mref=sync.ref.doc("main"),snap=await mref.get(),need=await handleRemote(snap);
+sync.ready=true;
+if(need)queuePush();
+mref.onSnapshot(function(sn){handleRemote(sn).then(function(n){if(n)queuePush();});},function(){});
+}catch(e){syncMsg("Sincronizarea nu a pornit ("+((e&&e.code)||"eroare")+"). Datele sunt salvate doar pe acest dispozitiv.");}
+}
+function $(id){return document.getElementById(id);}
+function num(v){var n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:0;}
+function fmt(n){return n.toLocaleString("ro-RO",{minimumFractionDigits:2,maximumFractionDigits:2})+" lei";}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+var DRE=/^\d{4}-\d{2}-\d{2}$/;
+var STORES=["Carrefour","Auchan","Kaufland","Lidl","Profi","Dedeman","Leroy Merlin"];
+var LINKS={Carrefour:"https://www.carrefour.ro",Auchan:"https://www.auchan.ro",Kaufland:"https://www.kaufland.ro",Lidl:"https://www.lidl.ro",Profi:"https://www.profi.ro","Dedeman":"https://www.dedeman.ro","Leroy Merlin":"https://www.leroymerlin.ro"};
+function today(){return new Date().toISOString().slice(0,10);}
+function dateAgo(d){return new Date(Date.now()-d*864e5).toISOString().slice(0,10);}
+function dm(x){return x.slice(8)+"."+x.slice(5,7);}
+function setStore(n,st,pr,sz,un,u){var k=key(n);if(!S.sp[k])S.sp[k]={name:String(n).trim(),st:{}};var old=S.sp[k].st[st],h=(old&&old.h)?old.h.slice():[];if(old&&old.p>0&&old.p!==pr&&old.d<today()){h.unshift([old.p,old.d]);h=h.slice(0,5);}var v={p:pr,size:sz,unit:un,d:today(),u:u||""};if(h.length)v.h=h;S.sp[k].st[st]=v;}
+function ageDays(d){return Math.max(0,Math.floor((Date.now()-new Date(d+"T12:00:00").getTime())/864e5));}
+function storeAges(){var m={};Object.keys(S.sp).forEach(function(k){Object.keys(S.sp[k].st).forEach(function(t){var d=S.sp[k].st[t].d;if(d&&(!m[t]||d>m[t]))m[t]=d;});});return m;}
+function dropOf(v){if(!v||!v.h||!v.h.length)return null;var o=v.h[0][0];if(o>0&&v.p<o*0.95)return{old:o,d:v.h[0][1],pct:Math.round((1-v.p/o)*100)};return null;}
+function prune(){var a=dateAgo(7),b=dateAgo(60);Object.keys(S.sp).forEach(function(k){var e=S.sp[k];Object.keys(e.st).forEach(function(t){var v=e.st[t];if((v.u&&v.u<a)||(!v.u&&v.d<b))delete e.st[t];});if(!Object.keys(e.st).length)delete S.sp[k];});}
+function fold(x){return String(x).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();}
+function products(){var m={};[S.prices,S.sp].forEach(function(src){Object.keys(src).forEach(function(k){m[k]=src[k].name||k;});});return m;}
+function matches(q){
+var f=fold(q);if(!f)return[];
+var w=f.split(" "),P=products(),out=[];
+Object.keys(P).forEach(function(k){var fk=fold(P[k]);if(w.every(function(x){return fk.indexOf(x)>=0;}))out.push(k);});
+out.sort(function(a,b){var fa=fold(P[a]),fb=fold(P[b]),sa=fa.indexOf(f)===0?0:1,sb=fb.indexOf(f)===0?0:1;return(sa-sb)||(fa.length-fb.length);});
+return out;
+}
+function resolveKey(name){var k=key(name);if(S.sp[k])return k;var f=fold(name),P=products(),r=null;Object.keys(P).forEach(function(x){if(!r&&S.sp[x]&&fold(P[x])===f)r=x;});return r;}
+function validRows(k){
+var e=S.sp[k];if(!e)return[];
+var t=today(),rows=[];
+Object.keys(e.st).forEach(function(n){var v=e.st[n];if(v.u&&v.u<t)return;rows.push({s:n,v:v});});
+rows.sort(function(a,b){var x=unitPrice(a.v.p,a.v.size,a.v.unit),y=unitPrice(b.v.p,b.v.size,b.v.unit);return(x&&y&&x.u===y.u)?x.v-y.v:a.v.p-b.v.p;});
+return rows;
+}
+function bestStore(k){var r=validRows(k);return r.length?r[0]:null;}
+function storeHint(k){
+var rows=validRows(k);if(!rows.length)return"";
+return"Pe magazine, cel mai ieftin primul: "+rows.map(function(r){return r.s+" "+fmt(r.v.p)+" ("+(r.v.u?"până la "+dm(r.v.u):"din "+dm(r.v.d))+")";}).join("; ")+".";
+}
+function renderCatalog(){
+var st=$("v-store").value,q=fold($("v-q").value),ul=$("v-list"),t=today();ul.textContent="";
+var all=[],rows=[];
+Object.keys(S.sp).forEach(function(k){var e=S.sp[k],v=e.st[st];if(!v)return;all.push(k);if(q&&fold(e.name).indexOf(q)<0)return;rows.push({k:k,n:e.name,v:v});});
+rows.sort(function(a,b){return a.n<b.n?-1:1;});
+$("v-count").textContent=st+": "+all.length+(all.length===1?" produs salvat":" produse salvate")+(q?" ("+rows.length+" găsite)":"")+(rows.length>200?". Se afișează primele 200, folosește căutarea.":".")+(storeAges()[st]?" Actualizat "+(ageDays(storeAges()[st])===0?"azi":"acum "+ageDays(storeAges()[st])+" zile")+".":"");
+rows.slice(0,200).forEach(function(r){
+var v=r.v,li=el("li"),nm=el("span","name",r.n),up=unitPrice(v.p,v.size,v.unit),exp=v.u&&v.u<t,dr=dropOf(v);
+var sm=el("small","",(up?fmt(up.v)+"/"+up.u+" · ":"")+(exp?"expirat":(v.u?"până la "+dm(v.u):"din "+dm(v.d)))+(dr?" · ↓ era "+fmt(dr.old):""));
+sm.style.display="block";sm.style.color=exp?"var(--bad)":"var(--muted)";nm.appendChild(sm);
+li.appendChild(nm);li.appendChild(el("span","amt",fmt(v.p)));
+li.appendChild(delBtn("Șterge "+r.n+" din catalogul "+st,function(){var e=S.sp[r.k];if(e){delete e.st[st];if(!Object.keys(e.st).length)delete S.sp[r.k];}save();renderStat();renderNames();renderCos();}));
+ul.appendChild(li);
+});
+if(!rows.length)ul.appendChild(el("li","empty",all.length?"Nimic găsit pentru căutarea ta.":"Nu ai salvat încă prețuri pentru "+st+"."));
+}
+function renderStat(){renderCatalog();var n=0,c=0;Object.keys(S.sp).forEach(function(k){n++;c+=Object.keys(S.sp[k].st).length;});var pc={};Object.keys(S.sp).forEach(function(k){Object.keys(S.sp[k].st).forEach(function(x){pc[x]=(pc[x]||0)+1;});});
+renderStale();renderDrops();
+$("i-stat").textContent=n?"Prețuri salvate: "+STORES.filter(function(x){return pc[x];}).map(function(x){return x+" "+pc[x];}).join(" · ")+".":"Nu ai salvat încă prețuri din cataloage.";}
+function renderStale(){
+var ag=storeAges(),old=[],fresh=0;
+STORES.forEach(function(t){if(!ag[t])return;var a=ageDays(ag[t]);if(a>=7)old.push(t+" ("+a+" zile)");else fresh++;});
+$("i-stale").textContent=old.length?"Prețuri mai vechi de o săptămână: "+old.join(", ")+". Reîmprospătează-le din catalog ca să nu cumperi după prețuri vechi.":(fresh?"Toate cataloagele sunt proaspete (sub 7 zile).":"");
+}
+function renderDrops(){
+var ul=$("i-drops"),t=today(),rows=[];ul.textContent="";
+Object.keys(S.sp).forEach(function(k){var e=S.sp[k];Object.keys(e.st).forEach(function(s){var v=e.st[s];if(v.u&&v.u<t)return;var d=dropOf(v);if(d)rows.push({n:e.name,s:s,v:v,d:d});});});
+rows.sort(function(a,b){return b.d.pct-a.d.pct;});
+$("drops").hidden=!rows.length;
+rows.slice(0,15).forEach(function(r){
+var li=el("li"),nm=el("span","name",r.n),sm=el("small","",r.s+" · era "+fmt(r.d.old)+(r.d.d?" ("+dm(r.d.d)+")":"")+" · −"+r.d.pct+"%");
+sm.style.display="block";sm.style.color="var(--muted)";nm.appendChild(sm);li.appendChild(nm);li.appendChild(el("span","amt",fmt(r.v.p)));
+var b=el("button","link","Adaugă");b.type="button";b.onclick=function(){S.items.push({id:uid(),name:r.n,price:r.v.p,size:r.v.size,unit:r.v.unit,qty:1,done:false});save();renderCos();$("msg").textContent="Am adăugat în listă: "+r.n+" ("+r.s+").";};li.appendChild(b);
+ul.appendChild(li);});
+}
+function initStores(){
+var bc=$("b-cat");CATS.forEach(function(c){var o=document.createElement("option");o.value=c;o.textContent=c;bc.appendChild(o);});bc.value="Facturi";
+var L=$("links");STORES.forEach(function(t){var a=el("a","ext",t);a.href=LINKS[t];a.target="_blank";a.rel="noopener noreferrer";L.appendChild(a);});
+[$("i-store"),$("c-store"),$("at"),$("v-store")].forEach(function(sel){STORES.forEach(function(t){var o=document.createElement("option");o.value=t;o.textContent=t;sel.appendChild(o);});});
+}
+var editId=null,view="flat";
+function renderBase(){
+var ul=$("base-l");ul.textContent="";
+S.base.forEach(function(nm,i){var li=el("li");li.appendChild(el("span","name",nm));li.appendChild(delBtn("Scoate "+nm+" din lista de bază",function(){S.base.splice(i,1);save();renderBase();}));ul.appendChild(li);});
+if(!S.base.length)ul.appendChild(el("li","empty","Lista de bază e goală."));
+}
+function copyOut(t){
+var m=$("msg"),ta=$("share-out");
+ta.value=t;ta.hidden=false;
+var ok=function(y){m.textContent=y?"Lista a fost copiată.":"Selectează textul de mai jos și copiază-l.";if(!y){ta.focus();ta.select();}};
+try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){ok(true);},function(){ok(false);});else ok(false);}catch(e){ok(false);}
+}
+function listText(){
+var todo=S.items.filter(function(x){return !x.done;});
+if(!todo.length)return"";
+var g={},ord=[];
+todo.forEach(function(it){var k=resolveKey(it.name),bs=k?bestStore(k):null,n=bs?bs.s:"";if(!g[n]){g[n]=[];ord.push(n);}g[n].push("- "+it.name+(it.qty!==1?" × "+it.qty:""));});
+ord.sort(function(a,b){return a===""?1:(b===""?-1:(a<b?-1:1));});
+var named=ord.some(function(x){return x!=="";}),out=["Lista de cumpărături"];
+ord.forEach(function(n){if(named)out.push("",(n||"Fără magazin ales")+":");out.push.apply(out,g[n]);});
+return out.join("\n");
+}
+function renderCats(){
+var box=$("cats");box.textContent="";
+var t={},tot=0;S.ent.forEach(function(e){var c=e.cat||"Altele";t[c]=(t[c]||0)+e.amt;tot+=e.amt;});
+var ks=Object.keys(t).sort(function(a,b){return t[b]-t[a];});
+if(!ks.length){box.appendChild(el("p","hint","Nicio cheltuială în luna aceasta."));return;}
+ks.forEach(function(c){
+var d=el("div","hrow"),h=el("div","hh");
+h.appendChild(el("span","",c));h.appendChild(el("b","",fmt(t[c])+" · "+Math.round(t[c]/tot*100)+"%"));
+var b=el("div","hbar"),i=document.createElement("i");i.style.width=(t[ks[0]]>0?t[c]/t[ks[0]]*100:0)+"%";
+b.appendChild(i);d.appendChild(h);d.appendChild(b);box.appendChild(d);});
+}
+function renderDue(){
+var box=$("due");box.textContent="";
+var cur=new Date().getDate(),rows=[];
+S.ent.forEach(function(e){if(e.day>0&&!e.paid)rows.push({e:e,left:e.day-cur});});
+rows=rows.filter(function(r){return r.left<=7;}).sort(function(a,b){return a.left-b.left;});
+var soon=rows.filter(function(r){return r.left<=3;}).length;
+$("t-bug").textContent="Buget"+(soon?" ("+soon+")":"");
+if(!rows.length)return;
+box.appendChild(el("h2","","De plătit în curând"));
+var ul=el("ul");
+rows.forEach(function(r){
+var li=el("li"),nm=el("span","name",r.e.name);
+var sm=el("small","",r.left<0?"întârziat cu "+(-r.left)+(r.left===-1?" zi":" zile"):(r.left===0?"scadent azi":"în "+r.left+(r.left===1?" zi":" zile")+" (ziua "+r.e.day+")"));
+sm.style.display="block";sm.style.color=r.left<=0?"var(--bad)":"var(--muted)";nm.appendChild(sm);li.appendChild(nm);
+li.appendChild(el("span","amt",fmt(r.e.amt)));
+var b=el("button","link","Plătit");b.type="button";b.onclick=function(){r.e.paid=true;save();renderBug();};li.appendChild(b);
+ul.appendChild(li);});
+box.appendChild(ul);
+}
+function renderGoal(){
+var g=S.goal,box=$("g-bar");box.textContent="";
+if(!(g.target>0)){box.appendChild(el("p","hint","Scrie o sumă țintă ca să vezi progresul."));return;}
+var d=el("div","hrow"),h=el("div","hh");
+h.appendChild(el("span","",g.name||"Obiectiv"));h.appendChild(el("b","",fmt(g.saved)+" din "+fmt(g.target)+" ("+Math.round(g.saved/g.target*100)+"%)"));
+var b=el("div","hbar"),i=document.createElement("i");i.style.width=Math.min(100,g.saved/g.target*100)+"%";
+b.appendChild(i);d.appendChild(h);d.appendChild(b);box.appendChild(d);
+box.appendChild(el("p","hint",g.saved>=g.target?"Ai atins obiectivul.":"Mai ai de strâns "+fmt(g.target-g.saved)+"."));
+}
+function bump(name){var k=key(name);if(!S.freq[k])S.freq[k]={name:String(name).trim(),n:0};S.freq[k].n++;}
+function addQuick(name,quiet){
+var k=resolveKey(name)||key(name),bs=bestStore(k),m=S.prices[key(name)];
+var src=bs?{price:bs.v.p,size:bs.v.size,unit:bs.v.unit}:(m||{price:0,size:0,unit:""});
+S.items.push({id:uid(),name:name,price:src.price||0,size:src.size||0,unit:src.unit||"",qty:1,done:false});
+if(!quiet){save();renderCos();}
+}
+function renderFreq(){
+var box=$("freq"),t=$("freqt");box.textContent="";
+var on={};S.items.forEach(function(x){if(!x.done)on[key(x.name)]=1;});
+var arr=Object.keys(S.freq).map(function(k){return{k:k,f:S.freq[k]};}).filter(function(x){return x.f.n>=2&&!on[x.k];}).sort(function(a,b){return b.f.n-a.f.n;}).slice(0,8);
+t.textContent=arr.length?"Cumpărate des, apasă ca să adaugi în listă:":"";
+arr.forEach(function(x){var b=el("button","",x.f.name);b.type="button";b.onclick=function(){addQuick(x.f.name);};box.appendChild(b);});
+}
+function applyAt(){$("c-store").hidden=!!S.at;}
+function renderBan(){
+var ban=$("bkban"),cnt=S.items.length+S.ent.length+Object.keys(S.sp).length+Object.keys(S.prices).length;
+if(cnt<5){ban.hidden=true;return;}
+var days=S.lastBackup?Math.floor((Date.now()-new Date(S.lastBackup).getTime())/864e5):null;
+if(days!==null&&days<30){ban.hidden=true;return;}
+$("bkt").textContent=days===null?"Nu ai nicio copie de rezervă. Datele sunt doar pe acest telefon.":"Ultima copie de rezervă a fost acum "+days+" zile.";
+ban.hidden=false;
+}
+function editRow(it){
+var li=el("li");li.style.flexWrap="wrap";
+function inp(v,ph,lab,fl,mode){var i=document.createElement("input");i.value=v;i.placeholder=ph;i.setAttribute("aria-label",lab);if(mode)i.inputMode=mode;i.style.flex=fl;return i;}
+var nm=inp(it.name,"Produs","Produs","1 1 100%"),
+pr=inp(it.price>0?String(it.price).replace(".",","):"","Preț","Preț pe bucată","1 1 30%","decimal"),
+qt=inp(String(it.qty).replace(".",","),"Bucăți","Câte bucăți","1 1 30%","decimal"),
+sz=inp(it.size>0?String(it.size).replace(".",","):"","Mărime","Mărime ambalaj","1 1 30%","decimal");
+var un=document.createElement("select");un.setAttribute("aria-label","Unitate");
+["","g","kg","ml","l","m","mp"].forEach(function(u){var o=document.createElement("option");o.value=u;o.textContent=u||"—";un.appendChild(o);});
+un.value=it.unit||"";un.style.flex="1 1 25%";
+var cap=el("small","","Produs, apoi: preț pe bucată, câte bucăți, mărime ambalaj, unitate");cap.style.flexBasis="100%";cap.style.color="var(--muted)";
+var ok=el("button","add","Salvează");ok.type="button";ok.style.flex="1 1 40%";
+var no=el("button","link","Anulează");no.type="button";
+ok.onclick=function(){
+var n=nm.value.trim();if(!n)return;
+var q=num(qt.value),z=Math.max(0,num(sz.value));
+it.name=n;it.price=Math.max(0,num(pr.value));it.qty=q>0?q:1;it.size=z;it.unit=z>0?un.value:"";
+if(it.price>0){remember(it.name,it.price,it.size,it.unit);if(S.at)setStore(it.name,S.at,it.price,it.size,it.unit,"");}
+editId=null;save();renderCos();renderNames();
+};
+no.onclick=function(){editId=null;renderCos();};
+[nm,cap,pr,qt,sz,un,ok,no].forEach(function(e){li.appendChild(e);});
+return li;
+}
+function renderSplit(){
+var box=$("bystore");box.textContent="";
+var NO="Fără preț salvat",groups={},order=[];
+S.items.forEach(function(it){
+var k=resolveKey(it.name),bs=k?bestStore(k):null,g=bs?bs.s:NO,p=bs?bs.v.p:it.price;
+if(!groups[g]){groups[g]={items:[],tot:0};order.push(g);}
+groups[g].items.push({it:it,p:p});groups[g].tot+=p*it.qty;
+});
+order.sort(function(a,b){if(a===NO)return 1;if(b===NO)return-1;return a<b?-1:1;});
+if(!S.items.length)box.appendChild(el("p","hint","Lista e goală."));
+order.forEach(function(g){
+var gn=groups[g].items.length;
+box.appendChild(el("h2","",g+" · "+gn+(gn===1?" produs":" produse")+(groups[g].tot>0?" · "+fmt(groups[g].tot):"")));
+var cpb=el("button","link","Copiază această listă");cpb.type="button";
+cpb.onclick=function(){var left=groups[g].items.filter(function(x){return !x.it.done;});copyOut("Lista pentru "+(g===NO?"magazin de ales":g)+":\n"+left.map(function(x){return"- "+x.it.name+(x.it.qty!==1?" × "+x.it.qty:"");}).join("\n"));};
+box.appendChild(cpb);
+var ul=el("ul");
+groups[g].items.forEach(function(x){
+var li=el("li",x.it.done?"done":"");
+var cb=document.createElement("input");cb.type="checkbox";cb.checked=!!x.it.done;cb.setAttribute("aria-label","Pus în coș: "+x.it.name);
+cb.onchange=function(){x.it.done=cb.checked;save();renderCos();};
+li.appendChild(cb);
+li.appendChild(el("span","name",x.it.name+(x.it.qty!==1?" × "+x.it.qty:"")));
+if(x.p>0)li.appendChild(el("span","amt",fmt(x.p*x.it.qty)));
+ul.appendChild(li);
+});
+box.appendChild(ul);
+});
+}
+function applyView(){var st=view==="store";$("l-cos").hidden=st;$("bystore").hidden=!st;$("vw").textContent=st?"Arată lista simplă":"Arată listele pe magazine";}
+var autoFilled=false;
+function key(n){return String(n).trim().toLowerCase();}
+function remember(n,pr,sz,un){S.prices[key(n)]={name:String(n).trim(),price:pr,size:sz,unit:un};}
+function unitPrice(pr,sz,un){
+if(!(pr>0)||!(sz>0))return null;
+if(un==="g")return{v:pr/(sz/1000),u:"kg"};
+if(un==="kg")return{v:pr/sz,u:"kg"};
+if(un==="ml")return{v:pr/(sz/1000),u:"l"};
+if(un==="m")return{v:pr/sz,u:"m"};
+if(un==="mp")return{v:pr/sz,u:"mp"};
+if(un==="l")return{v:pr/sz,u:"l"};
+return null;}
+function curMonth(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");}
+function monthLabel(m){var a=m.split("-");return new Date(+a[0],+a[1]-1,1).toLocaleDateString("ro-RO",{month:"long",year:"numeric"});}
+function spentOf(list){var t=0;list.forEach(function(e){t+=e.amt;});return t;}
+function addRecurring(){S.rec.forEach(function(r){S.ent.push({id:uid(),name:r.name,amt:r.amt,type:"f",rec:true,cat:r.cat||"Facturi",day:r.day||0,paid:false});});}
+function rollover(){
+var c=curMonth();
+if(!S.month){S.month=c;return;}
+if(S.month===c)return;
+if(S.ent.length||S.income>0||S.extra.length){var m=S.month;S.hist=S.hist.filter(function(h){return h.m!==m;});S.hist.push({m:m,income:S.income+spentOf(S.extra),spent:spentOf(S.ent)});S.hist.sort(function(a,b){return a.m<b.m?-1:1;});}
+S.hist=S.hist.slice(-36);S.ent=[];S.extra=[];S.month=c;addRecurring();
+}
+function renderNames(){var dl=$("dl");dl.textContent="";var seen={};[S.prices,S.sp].forEach(function(src){Object.keys(src).forEach(function(k){var nm=src[k].name||k;if(seen[key(nm)])return;seen[key(nm)]=1;var o=document.createElement("option");o.value=nm;dl.appendChild(o);});});}
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
+function delBtn(label,fn){var b=el("button","del","×");b.type="button";b.setAttribute("aria-label",label);b.onclick=fn;return b;}
+
+function renderCmp(){
+var box=$("cmp");box.textContent="";
+var todo=S.items.filter(function(x){return !x.done;});
+if(!todo.length)return;
+var t=today(),res=STORES.map(function(s){return{s:s,tot:0,have:0,miss:0};}),mix=0,mixN=0,none=[];
+todo.forEach(function(it){
+var k=resolveKey(it.name),best=null;
+STORES.forEach(function(s,i){
+var v=k&&S.sp[k].st[s];
+if(v&&!(v.u&&v.u<t)){res[i].tot+=v.p*it.qty;res[i].have++;if(best===null||v.p<best)best=v.p;}else res[i].miss++;
+});
+if(best!==null){mix+=best*it.qty;mixN++;}else none.push(it.name);
+});
+res=res.filter(function(r){return r.have>0;});
+if(!res.length)return;
+res.sort(function(a,b){return(a.miss-b.miss)||(a.tot-b.tot);});
+box.appendChild(el("h2","","Cât costă lista la fiecare magazin"));
+var g=el("div","sum");
+res.forEach(function(r,i){
+g.appendChild(el("span","",r.s+(r.miss?" (lipsesc "+r.miss+" din "+todo.length+")":(i===0?" · cel mai ieftin":""))));
+g.appendChild(el("b","",fmt(r.tot)));
+});
+box.appendChild(g);
+var ag=storeAges(),olds=res.filter(function(r){return ag[r.s]&&ageDays(ag[r.s])>=7;}).map(function(r){return r.s+" ("+ageDays(ag[r.s])+" zile)";});
+if(olds.length)box.appendChild(el("p","hint","Atenție, prețuri mai vechi de o săptămână: "+olds.join(", ")+". Reîmprospătează-le în Cataloage."));
+if(res[0].miss)box.appendChild(el("p","hint","Niciun magazin nu are preț pentru toate produsele, deci totalurile sunt parțiale."));
+if(mixN>1)box.appendChild(el("p","hint","Dacă iei fiecare produs de unde e mai ieftin: "+fmt(mix)+" pentru "+mixN+" din "+todo.length+" produse."));
+if(none.length)box.appendChild(el("p","hint","Fără preț salvat nicăieri: "+none.join(", ")+"."));
+}
+function renderCos(){
+var ul=$("l-cos");ul.textContent="";
+var all=0,inCart=0,left=0;
+S.items.forEach(function(it){
+var line=it.price*it.qty;all+=line;if(it.done)inCart+=line;else left+=line;
+if(editId===it.id){ul.appendChild(editRow(it));return;}
+var li=el("li",it.done?"done":"");
+var cb=document.createElement("input");cb.type="checkbox";cb.checked=!!it.done;
+cb.setAttribute("aria-label","Pus în coș: "+it.name);
+cb.onchange=function(){it.done=cb.checked;save();renderCos();};
+li.appendChild(cb);
+var nm=el("span","name",it.name+(it.qty!==1?" × "+it.qty:""));
+var up=unitPrice(it.price,it.size,it.unit);
+if(up){var sm=el("small","",fmt(up.v)+"/"+up.u);sm.style.display="block";sm.style.color="var(--muted)";nm.appendChild(sm);}
+if(S.at){var rk=resolveKey(it.name),rv=rk&&S.sp[rk].st[S.at],okv=rv&&!(rv.u&&rv.u<today());var hs=el("small","",okv?"aici ("+S.at+"): "+fmt(rv.p):"fără preț salvat la "+S.at);hs.style.display="block";hs.style.color="var(--muted)";nm.appendChild(hs);}
+li.appendChild(nm);
+var mn=el("button","del","−");mn.type="button";mn.style.padding=".3rem .4rem";mn.setAttribute("aria-label","Mai puțin "+it.name);mn.onclick=function(){if(it.qty>1){it.qty=Math.max(1,it.qty-1);save();renderCos();}};
+var pl=el("button","del","+");pl.type="button";pl.style.padding=".3rem .4rem";pl.setAttribute("aria-label","Mai mult "+it.name);pl.onclick=function(){it.qty=it.qty+1;save();renderCos();};
+li.appendChild(mn);li.appendChild(pl);
+if(line>0)li.appendChild(el("span","amt",fmt(line)));
+var eb=el("button","del","✎");eb.type="button";eb.setAttribute("aria-label","Modifică "+it.name);eb.onclick=function(){editId=it.id;renderCos();};li.appendChild(eb);
+li.appendChild(delBtn("Șterge "+it.name,function(){S.items=S.items.filter(function(x){return x.id!==it.id;});save();renderCos();}));
+ul.appendChild(li);
+});
+if(!S.items.length){var e=el("li","empty","Lista e goală. Adaugă primul produs mai sus.");ul.appendChild(e);}
+$("finish").textContent=inCart>0?"Am terminat: scade "+fmt(inCart)+" din buget":"Am terminat cumpărăturile";
+$("tot").textContent=fmt(all);
+var card=$("tot").parentNode,bar=$("bar"),cm=$("capmsg");
+if(S.cap>0){bar.hidden=false;$("fill").style.width=Math.min(100,all/S.cap*100)+"%";
+if(all>S.cap){card.classList.add("over");cm.textContent="Ai depășit plafonul cu "+fmt(all-S.cap)+".";}
+else{card.classList.remove("over");cm.textContent="Mai ai "+fmt(S.cap-all)+" până la plafon.";}
+}else{bar.hidden=true;cm.textContent="";card.classList.remove("over");}
+renderCmp();renderSplit();applyView();renderFreq();
+$("sub").textContent=S.items.length?("În coș: "+fmt(inCart)+" · Mai ai de luat: "+fmt(left)):"";
+}
+
+function renderRec(){
+var ul=$("l-rec");ul.textContent="";
+S.rec.forEach(function(r){var li=el("li");li.appendChild(el("span","name",r.name));li.appendChild(el("span","amt",fmt(r.amt)));li.appendChild(delBtn("Șterge "+r.name+" din cheltuielile lunare",function(){S.rec=S.rec.filter(function(x){return x.id!==r.id;});save();renderRec();}));ul.appendChild(li);});
+if(!S.rec.length)ul.appendChild(el("li","empty","Nimic încă. Bifează „Se repetă în fiecare lună” când adaugi o factură."));
+}
+function renderHist(){
+var box=$("hist");box.textContent="";
+var rows=[{m:S.month||curMonth(),spent:spentOf(S.ent),income:S.income+spentOf(S.extra),now:true}];
+S.hist.slice().reverse().slice(0,6).forEach(function(h){rows.push({m:h.m,spent:h.spent,income:h.income});});
+var max=0;rows.forEach(function(r){if(r.spent>max)max=r.spent;});
+if(!S.hist.length)box.appendChild(el("p","hint","Istoricul apare după prima lună încheiată. Luna nouă începe singură, cu cheltuielile lunare deja adăugate."));
+rows.forEach(function(r){
+var d=el("div","hrow"),h=el("div","hh");
+h.appendChild(el("span","",monthLabel(r.m)+(r.now?" (acum)":"")));
+h.appendChild(el("b","",fmt(r.spent)+(r.income>0?" din "+fmt(r.income):"")));
+var b=el("div","hbar"),i=document.createElement("i");
+i.style.width=(max>0?r.spent/max*100:0)+"%";
+if(r.income>0&&r.spent>r.income)i.style.background="var(--bad)";
+b.appendChild(i);d.appendChild(h);d.appendChild(b);box.appendChild(d);
+});
+}
+function renderExtra(){
+var ul=$("l-x");ul.textContent="";
+S.extra.forEach(function(x){
+var li=el("li"),nm=el("span","name",x.name);
+if(x.date){var sm=el("small","",dm(x.date));sm.style.display="block";sm.style.color="var(--muted)";nm.appendChild(sm);}
+li.appendChild(nm);li.appendChild(el("span","amt",fmt(x.amt)));
+li.appendChild(delBtn("Șterge "+x.name,function(){S.extra=S.extra.filter(function(y){return y.id!==x.id;});save();renderBug();}));
+ul.appendChild(li);});
+if(!S.extra.length)ul.appendChild(el("li","empty","Niciun venit extra în luna aceasta."));
+}
+function renderBug(){
+var ul=$("l-bug");ul.textContent="";
+var f=0,c=0;
+S.ent.forEach(function(en){
+if(en.type==="f")f+=en.amt;else c+=en.amt;
+var li=el("li");
+var enm=el("span","name",en.name+(en.rec?" (lunar)":en.type==="f"?" (fix)":""));var esm=el("small","",(en.cat||"Altele")+(en.day?" · ziua "+en.day:""));esm.style.display="block";esm.style.color="var(--muted)";enm.appendChild(esm);li.appendChild(enm);
+li.appendChild(el("span","amt",fmt(en.amt)));
+li.appendChild(delBtn("Șterge "+en.name,function(){S.ent=S.ent.filter(function(x){return x.id!==en.id;});save();renderBug();}));
+ul.appendChild(li);
+});
+if(!S.ent.length)ul.appendChild(el("li","empty","Nicio cheltuială adăugată încă."));
+var xs=spentOf(S.extra),rest=S.income+xs-f-c;
+$("s-inc").textContent=fmt(S.income);$("s-x").textContent=fmt(xs);$("s-t").textContent=fmt(S.income+xs);$("s-f").textContent=fmt(f);$("s-c").textContent=fmt(c);
+var r=$("rest");r.textContent=fmt(rest);
+renderRec();renderHist();renderCats();renderDue();renderExtra();
+}
+
+$("f-cos").onsubmit=function(e){
+e.preventDefault();
+var name=$("c-name").value.trim();if(!name)return;
+var q=num($("c-qty").value);
+var pr=Math.max(0,num($("c-price").value)),sz=Math.max(0,num($("c-size").value)),un=$("c-unit").value;
+if(!(sz>0)){sz=0;un="";}
+S.items.push({id:uid(),name:name,price:pr,size:sz,unit:un,qty:q>0?q:1,done:false});
+if(pr>0)remember(name,pr,sz,un);var stv=S.at||$("c-store").value;if(pr>0&&stv)setStore(name,stv,pr,sz,un,"");
+save();e.target.reset();$("hint").textContent="";$("sug").textContent="";autoFilled=false;$("gen").hidden=true;$("c-name").focus();renderCos();renderNames();
+};
+$("cap").value=S.cap?String(S.cap):"";
+$("cap").oninput=function(){S.cap=Math.max(0,num(this.value));save();renderCos();};
+$("c-price").oninput=function(){autoFilled=false;};
+function renderGen(q){
+var box=$("gen");box.textContent="";
+if(fold(q).length<3){box.hidden=true;return;}
+var ks=matches(q).filter(function(k){return S.sp[k];}),t=today(),cands=[];
+ks.forEach(function(k){var e=S.sp[k];Object.keys(e.st).forEach(function(s){var v=e.st[s];if(v.u&&v.u<t)return;cands.push({n:e.name,s:s,v:v,up:unitPrice(v.p,v.size,v.unit)});});});
+var cnt={},dom="",mx=0;cands.forEach(function(c){if(c.up)cnt[c.up.u]=(cnt[c.up.u]||0)+1;});
+Object.keys(cnt).forEach(function(u){if(cnt[u]>mx){mx=cnt[u];dom=u;}});
+if(dom)cands=cands.filter(function(c){return c.up&&c.up.u===dom;});
+var best={};
+cands.forEach(function(c){var b=best[c.s],sc=c.up?c.up.v:c.v.p;if(!b||sc<b.sc)best[c.s]={c:c,sc:sc};});
+var rows=Object.keys(best).map(function(s){return best[s];}).sort(function(a,b){return a.sc-b.sc;});
+if(ks.length<2||!rows.length){box.hidden=true;return;}
+box.hidden=false;
+var h=el("p","hint","Cel mai ieftin „"+q.trim()+"” pe magazine"+(dom?" (după preț pe "+dom+")":"")+":");box.appendChild(h);
+var ul=el("ul");
+rows.slice(0,7).forEach(function(r,i){
+var c=r.c,li=el("li"),nm=el("span","name",c.s+" · "+c.n);
+if(i===0&&rows.length>1)nm.appendChild(el("span","badge","cel mai ieftin"));
+var sm=el("small","",(c.up?fmt(c.up.v)+"/"+c.up.u+" · ":"")+(c.v.u?"până la "+dm(c.v.u):"din "+dm(c.v.d)));sm.style.display="block";sm.style.color="var(--muted)";nm.appendChild(sm);
+li.appendChild(nm);li.appendChild(el("span","amt",fmt(c.v.p)));
+var b=el("button","link","Adaugă");b.type="button";
+b.onclick=function(){S.items.push({id:uid(),name:c.n,price:c.v.p,size:c.v.size,unit:c.v.unit,qty:1,done:false});remember(c.n,c.v.p,c.v.size,c.v.unit);save();$("c-name").value="";$("c-price").value="";$("c-size").value="";$("c-unit").value="";$("hint").textContent="Adăugat în listă: "+c.n+" ("+c.s+").";$("sug").textContent="";box.hidden=true;autoFilled=false;renderCos();renderNames();};
+li.appendChild(b);ul.appendChild(li);});
+box.appendChild(ul);
+}
+function onName(){
+renderGen($("c-name").value);
+var q=$("c-name").value,k=key(q),h=$("hint"),sug=$("sug"),P=products(),ms=matches(q),f=fold(q);
+if(!S.prices[k]&&!S.sp[k]){var ex=ms.filter(function(x){return fold(P[x])===f;});if(ex.length)k=ex[0];}
+var m=S.prices[k],sh=k?storeHint(k):"",bs=k?bestStore(k):null;
+sug.textContent="";
+if(f.length>=2){ms.filter(function(x){return x!==k;}).slice(0,6).forEach(function(x){
+var bb=bestStore(x),b=el("button","",P[x]+(bb?" · "+fmt(bb.v.p):""));b.type="button";
+b.onclick=function(){$("c-name").value=P[x];onName();};sug.appendChild(b);});}
+if(!k||(!m&&!bs)){h.textContent=sh;if(autoFilled){$("c-price").value="";$("c-size").value="";$("c-unit").value="";$("c-store").value="";autoFilled=false;}return;}
+var av=(S.at&&k&&S.sp[k]&&S.sp[k].st[S.at]&&!(S.sp[k].st[S.at].u&&S.sp[k].st[S.at].u<today()))?S.sp[k].st[S.at]:null;
+var src=av?{price:av.p,size:av.size,unit:av.unit}:(bs?{price:bs.v.p,size:bs.v.size,unit:bs.v.unit}:m);
+h.textContent=bs?sh:("Ultima dată: "+fmt(m.price)+(m.size>0?" pentru "+String(m.size).replace(".",",")+" "+m.unit:"")+".");
+if(!$("c-price").value||autoFilled){
+$("c-price").value=String(src.price).replace(".",",");
+$("c-size").value=src.size>0?String(src.size).replace(".",","):"";
+$("c-unit").value=src.size>0?src.unit:"";
+$("c-store").value=S.at?"":(bs?bs.s:"");
+autoFilled=true;}
+}
+$("c-name").oninput=onName;
+$("f-x").onsubmit=function(e){e.preventDefault();var a=num($("x-amt").value);if(!(a>0))return;S.extra.push({id:uid(),name:($("x-name").value.trim()||"Venit extra").slice(0,80),amt:a,date:today()});$("x-name").value="";$("x-amt").value="";save();renderBug();};
+$("b-type").onchange=function(){$("b-cat").value=this.value==="f"?"Facturi":"Altele";};
+$("g-name").value=S.goal.name;$("g-target").value=S.goal.target?String(S.goal.target):"";
+$("g-name").oninput=function(){S.goal.name=this.value.slice(0,60);save();renderGoal();};
+$("g-target").oninput=function(){S.goal.target=Math.max(0,num(this.value));save();renderGoal();};
+$("g-btn").onclick=function(){var a=num($("g-add").value);if(!a)return;S.goal.saved=Math.max(0,S.goal.saved+a);$("g-add").value="";save();renderGoal();};
+$("base-add").onclick=function(){var v=$("base-in").value.trim();if(!v)return;if(S.base.map(function(x){return key(x);}).indexOf(key(v))<0)S.base.push(v.slice(0,80));$("base-in").value="";save();renderBase();};
+$("base-cur").onclick=function(){var nm=[],seen={};S.items.forEach(function(x){if(!x.done&&!seen[key(x.name)]){seen[key(x.name)]=1;nm.push(x.name);}});if(!nm.length)return;if(S.base.length&&!confirm("Înlocuiești lista de bază cu lista curentă?"))return;S.base=nm.slice(0,200);save();renderBase();};
+$("base-go").onclick=function(){var on={};S.items.forEach(function(x){if(!x.done)on[key(x.name)]=1;});var n=0;S.base.forEach(function(nm){if(!on[key(nm)]){addQuick(nm,true);on[key(nm)]=1;n++;}});save();renderCos();$("msg").textContent=n?n+" produse adăugate din lista de bază.":"Toate produsele din bază sunt deja în listă.";};
+$("share").onclick=function(){
+var t=listText(),m=$("msg"),ta=$("share-out");
+if(!t){m.textContent="Lista e goală.";return;}
+ta.value=t;ta.hidden=false;
+var ok=function(y){m.textContent=y?"Lista a fost copiată. Lipește-o în WhatsApp sau într-un mesaj.":"Selectează textul de mai sus și copiază-l.";if(!y){ta.focus();ta.select();}};
+try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){ok(true);},function(){ok(false);});else ok(false);}catch(e){ok(false);}
+};
+$("wa").onclick=function(){var t=listText(),m=$("msg");if(!t){m.textContent="Lista e goală.";return;}try{window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank","noopener");}catch(e){}m.textContent="Dacă WhatsApp nu s-a deschis, apasă „Copiază lista ca text”.";};
+$("at").onchange=function(){S.at=this.value;S.atDay=today();save();applyAt();renderCos();};
+$("i-store").onchange=function(){if(cand.length)$("i-save").textContent="Salvează prețurile bifate pentru "+this.value;};
+$("v-store").onchange=renderCatalog;$("v-q").oninput=renderCatalog;
+$("v-clear").onclick=function(){var st=$("v-store").value,n=0;Object.keys(S.sp).forEach(function(k){if(S.sp[k].st[st])n++;});if(!n)return;if(!confirm("Ștergi toate cele "+n+" prețuri salvate pentru "+st+"?"))return;Object.keys(S.sp).forEach(function(k){delete S.sp[k].st[st];if(!Object.keys(S.sp[k].st).length)delete S.sp[k];});save();renderStat();renderNames();renderCos();};
+$("vw").onclick=function(){view=view==="store"?"flat":"store";applyView();};
+$("clear").onclick=function(){S.items.forEach(function(x){if(x.done)bump(x.name);});S.items=S.items.filter(function(x){return !x.done;});save();$("msg").textContent="";renderCos();};
+$("finish").onclick=function(){
+var msg=$("msg"),sum=0,n=0;
+S.items.forEach(function(x){if(x.done){sum+=x.price*x.qty;n++;}});
+if(!n){msg.textContent="Bifează întâi produsele pe care le-ai cumpărat.";return;}
+if(sum<=0){msg.textContent="Produsele bifate nu au preț, așa că nu am ce scădea din buget. Adaugă prețuri.";return;}
+S.items.forEach(function(x){if(x.done)bump(x.name);});
+var d=new Date();
+S.ent.push({id:uid(),name:"Cumpărături din "+d.toLocaleDateString("ro-RO",{day:"numeric",month:"long"}),amt:sum,type:"c",cat:"Mâncare"});
+S.items=S.items.filter(function(x){return !x.done;});
+save();renderCos();renderBug();
+msg.textContent=fmt(sum)+" au fost scăzuți din bugetul lunar. Produsele cumpărate au ieșit din listă.";
+};
+
+$("b-inc").value=S.income?String(S.income):"";
+$("b-inc").oninput=function(){S.income=Math.max(0,num(this.value));save();renderBug();};
+$("f-bug").onsubmit=function(e){
+e.preventDefault();
+var name=$("b-name").value.trim();var amt=num($("b-amt").value);
+if(!name||amt<=0)return;
+var rec=$("b-rec").checked,type=rec?"f":$("b-type").value,cat=$("b-cat").value,day=dyOf(num($("b-day").value));
+S.ent.push({id:uid(),name:name,amt:amt,type:type,rec:rec,cat:cat,day:day,paid:false});
+if(rec)S.rec.push({id:uid(),name:name,amt:amt,cat:cat,day:day});
+save();$("b-name").value="";$("b-amt").value="";$("b-rec").checked=false;$("b-day").value="";$("b-name").focus();renderBug();
+};
+$("new-month").onclick=function(){
+if(!S.ent.length)return;
+if(confirm("Ștergi toate cheltuielile din luna aceasta? Venitul și cheltuielile lunare rămân.")){S.ent=[];addRecurring();save();renderBug();}
+};
+
+var samp=null,caps=null,cand=[],curStore="";
+function errCopy(c){return({not_granted:"Nu ai permis folosirea lui Claude. Reîncarcă pagina ca să fii întrebat din nou.",rate_limited:"Prea multe cereri sau limita contului a fost atinsă. Încearcă mai târziu.",image_rejected:"O captură nu a putut fi citită. Încearcă alte imagini (JPEG, PNG sau WebP).",invalid_json:"Nu am putut înțelege răspunsul. Încearcă cu mai puține capturi.",cancelled:"",refused:"Imaginile nu au putut fi procesate."})[c]||"A apărut o problemă. Încearcă din nou peste puțin timp.";}
+function initImport(){
+$("rawbox").hidden=false;
+if(!samp){$("imp-off").textContent="Importul nu merge în această fereastră. Deschide aplicația din claude.ai (din conversația cu Claude sau din lista de artefacte), nu dintr-un link copiat în browser sau dintr-o scurtătură de pe ecran. Între timp poți adăuga prețurile manual, cu magazinul ales în formular. [Detalii: "+dbg+"]";return;}
+if(!caps||!caps.images){$("imp-off").textContent="Această aplicație Claude nu permite trimiterea de imagini către pagină. Încearcă din aplicația Claude de pe telefon sau de pe calculator. Între timp poți adăuga prețurile manual. [Detalii: "+dbg+"]";return;}
+$("imp-off").hidden=true;$("imp").hidden=false;$("i-files").accept=caps.images.mediaTypes.join(",");
+}
+var dbg="";
+try{if(window.claude&&window.claude.use){window.claude.use("sample").then(function(f){samp=f;if(!f){dbg="funcția sample e indisponibilă aici";return null;}return f.limits().then(function(c){caps=c;if(!c||!c.images)dbg="imagini neacceptate";},function(e){dbg="limite: "+(e&&(e.code||e.message));});}).then(initImport,initImport);}else{dbg="window.claude lipsește";initImport();}}catch(e){dbg="eroare: "+e.message;initImport();}
+var cf="";
+function candVis(c){var q=fold(cf);return !q||fold(c.name).indexOf(q)>=0;}
+function updCnt(){var k=cand.filter(function(c){return c.keep;}).length,v=cand.filter(candVis).length;$("i-cnt").textContent=k+" bifate din "+cand.length+(cf?" · "+v+" potrivite cu filtrul":"")+(v>300?". Se afișează primele 300, folosește filtrul.":".");}
+function renderCand(){
+var ul=$("i-list");ul.textContent="";
+if(cand.length<8){cf="";$("i-q").value="";}
+$("i-tools").hidden=cand.length<8;
+var shown=0;
+cand.forEach(function(c){
+if(!candVis(c)||shown>=300)return;shown++;
+var li=el("li");li.style.flexWrap="wrap";
+var cb=document.createElement("input");cb.type="checkbox";cb.checked=c.keep;cb.setAttribute("aria-label","Păstrează "+c.name);cb.onchange=function(){c.keep=cb.checked;updCnt();};
+var nm=document.createElement("input");nm.value=c.name;nm.setAttribute("aria-label","Nume produs");nm.style.flex="1 1 9rem";nm.oninput=function(){c.name=nm.value;};
+var pr=document.createElement("input");pr.value=String(c.price).replace(".",",");pr.setAttribute("aria-label","Preț în lei");pr.inputMode="decimal";pr.style.width="5rem";pr.oninput=function(){c.price=num(pr.value);};
+li.appendChild(cb);li.appendChild(nm);li.appendChild(pr);
+var meta=[];if(c.size>0)meta.push(String(c.size).replace(".",",")+" "+c.unit);if(c.until)meta.push("până la "+dm(c.until));if(c.note)meta.push(c.note);
+if(meta.length){var sm=el("small","",meta.join(" · "));sm.style.flexBasis="100%";sm.style.color="var(--muted)";li.appendChild(sm);}
+ul.appendChild(li);
+});
+$("i-save").hidden=!cand.length;$("i-save").textContent="Salvează prețurile bifate pentru "+$("i-store").value;
+updCnt();
+}
+$("i-q").oninput=function(){cf=this.value;renderCand();};
+$("i-all").onclick=function(){cand.forEach(function(c){if(candVis(c))c.keep=true;});renderCand();};
+$("i-none").onclick=function(){cand.forEach(function(c){if(candVis(c))c.keep=false;});renderCand();};
+function promptFor(st){return"Ești un asistent care citește cataloage de magazin din România. Imaginile sunt capturi din catalogul magazinului "+st+". Data de azi: "+today()+". Extrage produsele care au preț clar vizibil. Răspunde DOAR cu un array JSON de obiecte de forma {\"name\":string,\"price\":number,\"size\":number sau null,\"unit\":\"g\"|\"kg\"|\"ml\"|\"l\"|\"m\"|\"mp\"|\"buc\"|null,\"until\":\"YYYY-MM-DD\" sau null,\"note\":string sau null}. name = denumirea scurtă a produsului, cu marca, în română. price = prețul actual în lei pentru un ambalaj (nu prețul vechi tăiat și nu prețul informativ pe kg), cu punct zecimal. size și unit = mărimea ambalajului dacă se vede (de exemplu 1 l sau 500 g), altfel null. until = ultima zi a ofertei dacă apare perioada, cu anul din data de azi, altfel null. note = oferte speciale (2 la 1, preț cu card, de la-până la), altfel null. Nu inventa produse sau prețuri și omite ce nu se citește sigur. Exemplu: [{\"name\":\"lapte zuzu 1,5%\",\"price\":6.49,\"size\":1,\"unit\":\"l\",\"until\":\"2026-10-05\",\"note\":null}]";}
+$("i-go").onclick=async function(){
+var btn=this,msg=$("i-msg"),files=[].slice.call($("i-files").files);
+if(!samp||!caps||!caps.images)return;
+if(!files.length){msg.textContent="Alege întâi capturile din galerie.";return;}
+var mx=caps.images.maxCount,extra=files.length>mx;
+files=files.slice(0,mx);curStore=$("i-store").value;
+btn.disabled=true;msg.textContent="Citesc prețurile din "+files.length+" capturi. Poate dura până la un minut.";
+try{
+var data=await samp.json(promptFor(curStore),{images:files,modelTier:"default"});
+var UNS=["g","kg","ml","l","m","mp"];
+cand=(Array.isArray(data)?data:[]).filter(function(x){return x&&typeof x.name==="string"&&x.name.trim()&&Number(x.price)>0&&Number(x.price)<10000;}).slice(0,150).map(function(x){
+var sz=Number(x.size),un=UNS.indexOf(x.unit)>=0?x.unit:"";if(!(sz>0)||!un){sz=0;un="";}
+return{keep:true,name:x.name.trim().slice(0,80),price:Number(x.price),size:sz,unit:un,until:(typeof x.until==="string"&&DRE.test(x.until))?x.until:"",note:typeof x.note==="string"?x.note.slice(0,60):""};});
+renderCand();
+msg.textContent=cand.length?("Am găsit "+cand.length+" produse pentru "+$("i-store").value+". Verifică, corectează sau debifează ce e greșit, apoi salvează. Poți schimba magazinul înainte să salvezi."+(extra?" Am citit doar primele "+mx+" capturi; importă restul separat.":"")):"Nu am găsit produse cu preț clar. Încearcă capturi mai clare.";
+}catch(e){msg.textContent=errCopy(e&&e.code);}
+finally{btn.disabled=false;}
+};
+function parseCatalogText(txt){
+var L=txt.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
+var P=/^(\d{1,3}(?:\.\d{3})*|\d+),(\d{2}) lei$/,PU=/ lei\/(kg|l|buc)$/,DR=/(\d{2})\.(\d{2})\.(\d{4})\s*-\s*(\d{2})\.(\d{2})\.(\d{4})/;
+function pn(x){return parseFloat(x.replace(" lei","").replace(/\./g,"").replace(",","."));}
+function sizeFrom(t){
+var m=t.match(/,?\s*\(?(\d+)(?:\s*\+\s*(\d+))?\)?\s*[xX]\s*(\d+(?:[.,]\d+)?)\s*(g|kg|ml|l)\s*$/i);
+if(m){var c=Number(m[1])+(m[2]?Number(m[2]):0),z=c*Number(m[3].replace(",","."));return{size:Math.round(z*1000)/1000,unit:m[4].toLowerCase(),base:t.slice(0,m.index).replace(/[,\s]+$/,"")};}
+m=t.match(/,?\s*(\d+(?:[.,]\d+)?)\s*(g|kg|ml|l)\s*$/i);
+if(m)return{size:Number(m[1].replace(",",".")),unit:m[2].toLowerCase(),base:t.slice(0,m.index).replace(/[,\s]+$/,"")};
+return{size:0,unit:"",base:t};
+}
+var raw=[],until="",card=false;
+for(var i=0;i<L.length;i++){
+var d=L[i].match(DR);
+if(d){until=d[6]+"-"+d[5]+"-"+d[4];card=true;continue;}
+if(L[i]==="In stoc"&&i>0){
+var title=L[i-1],j=i+1,pr=[];
+while(j<L.length&&pr.length<2&&P.test(L[j])){pr.push(pn(L[j]));j++;}
+if(pr.length&&pr[0]>0&&title.length>2&&!PU.test(title)&&!P.test(title)){
+var sf=sizeFrom(title);
+raw.push({title:title,base:sf.base||title,price:pr[0],size:sf.size,unit:sf.unit,until:until,card:card});
+}
+until="";card=false;
+if(j<L.length&&PU.test(L[j]))j++;
+i=j-1;
+}
+}
+var cnt={};raw.forEach(function(r){var k=key(r.base);cnt[k]=(cnt[k]||0)+1;});
+return raw.map(function(r){return{keep:true,name:(cnt[key(r.base)]>1?r.title:r.base).slice(0,80),price:r.price,size:r.size,unit:r.unit,until:r.until,note:r.card?"preț cu card MyCLUB":""};}).slice(0,3000);
+}
+function mapCand(data){
+var UNS=["g","kg","ml","l","m","mp"];
+return(Array.isArray(data)?data:[]).filter(function(x){return x&&typeof x.name==="string"&&x.name.trim()&&Number(x.price)>0&&Number(x.price)<10000;}).slice(0,150).map(function(x){
+var sz=Number(x.size),un=UNS.indexOf(x.unit)>=0?x.unit:"";if(!(sz>0)||!un){sz=0;un="";}
+return{keep:true,name:x.name.trim().slice(0,80),price:Number(x.price),size:sz,unit:un,until:(typeof x.until==="string"&&DRE.test(x.until))?x.until:"",note:typeof x.note==="string"?x.note.slice(0,60):""};});
+}
+$("r-go").onclick=async function(){
+var btn=this,msg=$("i-msg"),txt=$("r-txt").value.trim();
+if(txt.length<20){msg.textContent="Lipește mai întâi textul copiat de pe pagina de oferte.";return;}
+var loc=parseCatalogText(txt);
+if(loc.length>=3){
+if(/MyCLUB|Filiera.?Auchan|Auchan/i.test(txt))$("i-store").value="Auchan";
+curStore=$("i-store").value;cand=loc;renderCand();
+var nc=cand.filter(function(c){return c.until;}).length;
+msg.textContent="Am recunoscut "+cand.length+" produse direct din text, pentru "+curStore+(nc?" ("+nc+" cu preț pe card, cu dată de expirare)":"")+". Dacă magazinul nu e cel bun, schimbă-l în lista de mai sus înainte să salvezi. Verifică lista, apoi apasă salvează.";
+return;
+}
+if(!samp){msg.textContent="Nu am recunoscut formatul textului, iar citirea cu Claude nu e disponibilă în această fereastră. Încearcă să copiezi toată pagina de produse, de la titlu până la ultimul produs.";return;}
+curStore=$("i-store").value;
+var mx=(caps&&caps.maxPromptBytes>8000)?Math.floor((caps.maxPromptBytes-6000)/2):40000,cut=txt.length>mx;
+if(cut)txt=txt.slice(0,mx);
+btn.disabled=true;msg.textContent="Citesc textul. Poate dura până la un minut.";
+try{
+var pr=promptFor(curStore).replace("Imaginile sunt capturi din catalogul magazinului","Textul de mai jos e copiat de pe pagina de oferte a magazinului")+" Ignoră meniurile, butoanele și orice text care nu descrie un produs cu preț.\n\nTEXT:\n"+txt;
+var data=await samp.json(pr,{modelTier:"default"});
+cand=mapCand(data);renderCand();
+msg.textContent=cand.length?("Am găsit "+cand.length+" produse pentru "+$("i-store").value+". Verifică, corectează sau debifează ce e greșit, apoi salvează. Poți schimba magazinul înainte să salvezi."+(cut?" Textul era prea lung, așa că am citit doar începutul.":"")):"Nu am găsit produse cu preț clar în text.";
+}catch(e){msg.textContent=errCopy(e&&e.code);}
+finally{btn.disabled=false;}
+};
+$("i-parse").onclick=function(){
+curStore=$("i-store").value;var rows=[],bad=0;
+$("i-txt").value.split("\n").forEach(function(line){
+if(!line.trim())return;
+var a=line.split("|").map(function(x){return x.trim();});
+var pr=num(a[1]);if(!a[0]||!(pr>0)){bad++;return;}
+var sz=0,un="",m=(a[2]||"").replace(",",".").match(/^([\d.]+)\s*(g|kg|ml|l|mp|m)$/i);
+if(m&&Number(m[1])>0){sz=Number(m[1]);un=m[2].toLowerCase();}
+var u="",d=(a[3]||"").match(/^(\d{1,2})\.(\d{1,2})$/);
+if(d)u=new Date().getFullYear()+"-"+("0"+d[2]).slice(-2)+"-"+("0"+d[1]).slice(-2);else if(DRE.test(a[3]||""))u=a[3];
+rows.push({keep:true,name:a[0].slice(0,80),price:pr,size:sz,unit:un,until:u,note:""});
+});
+cand=rows;renderCand();
+$("i-msg").textContent=rows.length?("Am citit "+rows.length+" produse pentru "+$("i-store").value+""+(bad?" ("+bad+" rânduri ignorate)":"")+". Verifică și salvează."):"Nu am găsit rânduri valide. Format: nume | preț | mărime | până la.";
+};
+$("i-save").onclick=function(){
+var n=0,curStore=$("i-store").value;
+cand.forEach(function(c){if(c.keep&&c.name.trim()&&c.price>0){setStore(c.name,curStore,c.price,c.size,c.unit,c.until);n++;}});
+prune();save();cand=[];renderCand();renderNames();renderStat();
+$("i-msg").textContent=n+" prețuri salvate pentru "+curStore+". Le vezi când scrii produsul în lista de cumpărături.";
+};
+function tab(w){["cos","bug","cat","bak"].forEach(function(k){$(k).hidden=k!==w;$("t-"+k).setAttribute("aria-selected",k===w);});}
+$("t-cos").onclick=function(){tab("cos");};
+$("t-bug").onclick=function(){tab("bug");};
+$("t-cat").onclick=function(){tab("cat");};
+$("t-bak").onclick=function(){tab("bak");};
+$("bkgo").onclick=function(){$("bkban").hidden=true;tab("bak");};
+$("bkno").onclick=function(){$("bkban").hidden=true;};
+$("mk").onclick=function(){
+S.lastBackup=new Date().toISOString().slice(0,10);save();$("bkban").hidden=true;
+var t=JSON.stringify(S),ta=$("bk"),m=$("bkmsg");
+ta.value=t;ta.focus();ta.select();
+var done=function(ok){m.textContent=ok?"Copia a fost copiată. Lipește-o într-un loc sigur, de exemplu într-o notiță.":"Selectează tot textul de mai sus, copiază-l și salvează-l într-o notiță.";};
+try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done(true);},function(){done(false);});}else done(false);}catch(e){done(false);}
+};
+$("rs").onclick=function(){
+var m=$("bkmsg"),p;
+try{p=JSON.parse($("bk").value);}catch(e){m.textContent="Textul nu e o copie validă. Lipește tot textul, de la început până la sfârșit.";return;}
+if(!p||typeof p!=="object"||(!Array.isArray(p.items)&&!Array.isArray(p.ent))){m.textContent="Textul nu arată ca o copie a acestei aplicații.";return;}
+if(!confirm("Restaurarea înlocuiește datele de acum cu cele din copie. Continui?"))return;
+apply(p);rollover();save();
+$("cap").value=S.cap?String(S.cap):"";$("b-inc").value=S.income?String(S.income):"";
+renderCos();renderBug();renderNames();
+m.textContent="Datele au fost restaurate.";
+};
+
+initStores();if(S.atDay!==today())S.at="";$("at").value=S.at;applyAt();rollover();prune();save(true);renderCos();renderBug();renderNames();renderStat();renderBan();renderBase();renderGoal();initSync();
+document.addEventListener("visibilitychange",function(){if(!document.hidden){var b=S.month;rollover();if(S.month!==b){save();renderBug();}}});
+})();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+</body>
+</html>
